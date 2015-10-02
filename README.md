@@ -24,7 +24,7 @@ You have three options:
 -	'lastComesFirst'		-> the functions queue is handled non-chronologically, everytime the queue moves on, the latest function added to the queue gets called next 
 -	'onlyConsiderLast'		-> once the queue moves on the latest function added to the queue gets called next, and the remaining queued functions are removed from the queue (ignored)
 
-Two example functions which could be queued:
+Three example functions which could be queued:
 
 	// first argument needs to be the function which moves onto the next in queue
 	var myAsyncFunction = function(callNextInQueue) {
@@ -61,9 +61,9 @@ Queue'em:
 	queueBuffer.add(myAsyncFunctionWithOneArgument, ['argument']);
 	queueBuffer.add(myAsyncFunctionWithTwoArguments, ['argument one', 'argument two']);
 
-When you queue functions which have custom arguments (more than the first mandatory queue argument callNextInQueue (you can call it whatever you want it just needs to be the first)) you pass an array with your custom arguments as the second argument to the add functino of the queue.
+When you queue functions which have custom arguments (more than the first mandatory queue argument callNextInQueue (you can call it whatever you want it just needs to be the first)) you pass an array with your custom arguments as the second argument to the add function of the queue.
 
-If you have problems understanding the difference between the three options, take a look how the console output looks for each queue option after the queue has finished:
+If you have problems understanding the difference between the three queue options, take a look at how the console output looks for each queue option after the queue has finished:
 
 'firstComesFirst':
 
