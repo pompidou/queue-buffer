@@ -13,6 +13,11 @@ Create a queue:
 	
 	var queueBuffer = new QueueBuffer();
 
+You can of course have multiple queues:
+
+	var queueOne = new QueueBuffer();
+	var queueTwo = new QueueBuffer();
+
 You can also define how the queue should be handled:
 
 	var queueBuffer = new QueueBuffer({
