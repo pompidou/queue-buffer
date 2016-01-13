@@ -3,7 +3,7 @@
 	'use strict';
 
 	/**
-	 * Simple queuing solution
+	 * Simple queuing solution by Frank Frick
 	 * Credits: http://ricostacruz.com/backbone-patterns/#animation_buffer
 	 */
 	window.QueueBuffer = function(options) {
