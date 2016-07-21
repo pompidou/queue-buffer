@@ -1,19 +1,26 @@
-(function() {
+/**
+ * QueueBuffer
+ *
+ * by Frank Frick
+ *
+ * A simple queuing solution
+ * Credits: http://ricostacruz.com/backbone-patterns/#animation_buffer
+ */
 
-	'use strict';
 
-	/**
-	 * Simple queuing solution by Frank Frick
-	 * Credits: http://ricostacruz.com/backbone-patterns/#animation_buffer
-	 */
+ (function() {
+
+ 	'use strict';
+
+
 	window.QueueBuffer = function(options) {
 
-		var queue			= [];
-		var currentItemIndex;
-		var defaultOptions 	= {
+		var defaultOptions 		= {
 			processQueueOption: 'firstComesFirst' // 'firstComesFirst' / 'lastComesFirst' / 'onlyConsiderLast'
 		};
-		options				= Util.extend(defaultOptions, options);
+		options					= Util.extend(defaultOptions, options);
+		var queue				= [];
+		var lastCommandFinished = true; // last remaining command in queue is meant
 
 
 		/**
@@ -29,10 +36,16 @@
 				fn: fn,
 				args: args
 			});
-			if (queue.length === 1) {
-				currentItemIndex = 0;
-				fn.apply(undefined, [next].concat(args)); // call function and pass the next function as the first argument followed by the actual arguments
+			if (lastCommandFinished) {
+				next();
 			}
+		};
+
+		/**
+		 * Empties the queue. I.e.: Dismisses all queued commands.
+		 */
+		var clear = function() {
+			queue = [];
 		};
 
 		/**
@@ -41,49 +54,59 @@
 		var next = function() {
 			var queueLength;
 			var queuedItem;
+			var nextItemIndex;
 
-			if (options.processQueueOption === 'firstComesFirst') {
-				queue.shift();
-				if (queue.length) {
-					queuedItem = queue[0];
-					currentItemIndex = 0;
-					queuedItem.fn.apply(undefined, [next].concat(queuedItem.args));
-				}
+			if (queue.length === 0) {
+				lastCommandFinished = true;
 			}
-			else if (options.processQueueOption === 'lastComesFirst') {
-				// queue.pop();
-				queue.splice(currentItemIndex, 1);
-				queueLength = queue.length;
-				if (queueLength) {
-					queuedItem = queue[queueLength - 1];
-					currentItemIndex = queueLength - 1;
-					queuedItem.fn.apply(undefined, [next].concat(queuedItem.args));
+			else {
+				if (options.processQueueOption === 'firstComesFirst') {
+					nextItemIndex = 0;
+					queuedItem = queue[nextItemIndex];
+					execute(queuedItem);
 				}
-			}
-			else if (options.processQueueOption === 'onlyConsiderLast') {
-				queue.splice(currentItemIndex, 1);
-				queueLength = queue.length;
-				if (queueLength) {
+				else if (options.processQueueOption === 'lastComesFirst') {
+					nextItemIndex = queue.length - 1;
+					queuedItem = queue[nextItemIndex];
+					execute(queuedItem);
+				}
+				else if (options.processQueueOption === 'onlyConsiderLast') {
+					queueLength = queue.length;
 					if (queueLength > 1) {
 						queue.splice(0, queueLength - 1);
 					}
-					queuedItem = queue[0];
-					currentItemIndex = 0;
-					queuedItem.fn.apply(undefined, [next].concat(queuedItem.args));
+					nextItemIndex = 0;
+					queuedItem = queue[nextItemIndex];
+					execute(queuedItem);
 				}
 			}
+		};
+
+		/**
+		 * Removes the next queued command from the queue, executes it and passes
+		 * the 'next' function as the first argument followed by the actual arguments.
+		 */
+		var execute = function(queuedItem) {
+			lastCommandFinished = false;
+			var queuedItemIndex = queue.indexOf(queuedItem);
+			queue.splice(queuedItemIndex, 1); // remove the item from the queue
+			queuedItem.fn.apply(undefined, [next].concat(queuedItem.args)); // execute the item's function
 		};
 
 
 		// public
 		return {
-			add: add
+			add: add,
+			clear: clear
 		};
 
 	};
 
+
 	// test
-	/*var queueBuffer = new QueueBuffer();
+	/*var queueBuffer = new QueueBuffer({
+		processQueueOption: 'firstComesFirst'
+	});
 	var exampleArgument = 'This is an example argument for a function which is queued.';
 	for (var i = 0; i < 5; i++) {
 		(function(i) {
@@ -98,5 +121,6 @@
 			}, [exampleArgument]);
 		}(i));
 	}*/
+
 
 }());
