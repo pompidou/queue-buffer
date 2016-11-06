@@ -97,7 +97,8 @@
 		// public
 		return {
 			add: add,
-			clear: clear
+			clear: clear,
+			moveOnNow: next
 		};
 
 	};
